@@ -84,12 +84,12 @@
     </div>
 
     <div class="company-info">
-      <strong>CIELO RAZOS  PVC</strong><br>
+      <strong>CIELO RAZOS  PVC 1.0</strong><br>
       Calle 123, Ciudad<br>
       Tel: 123-456-7890<br>
      DIRECION CALLE 11-11
     </div>
-    <div id="sucursal"></div>
+   
   </div>
 
   <h1>COTIZACIÓN</h1>
@@ -158,7 +158,7 @@
   
     const fecha = params.get('fecha') || "fecha no especificada";
     const cliente = params.get('cliente') || "cliente no especificada";
-    const sucursal = pamams.get('sucursal')  || " sucursalsucursal no especificada" 
+    const sucursal = params.get('sucursal')  || " sucursal no especificada" 
 
               // Mostrar en el HTML
      document.getElementById("fecha").textContent = fecha;
