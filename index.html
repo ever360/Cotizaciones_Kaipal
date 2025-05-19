@@ -235,6 +235,10 @@
         doc.save("cotizacion.pdf");
       });
     }
+    // 👉 Llamar automáticamente al abrir la página
+  window.onload = () => {
+  window.print();
+};
   </script>
 </body>
 </html>
