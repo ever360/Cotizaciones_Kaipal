@@ -93,7 +93,7 @@
 
   <h1>COTIZACIÓN</h1>
 
-  <p><strong>Cliente:</strong> Juan Pérez<br>
+  <p><strong>Cliente:</strong><span id="cliente"></spam> <br>
      <strong>Fecha:</strong> 14/05/2025<br>
      <strong>Dirección:</strong> Av. Principal #456, Ciudad</p>
      <BR>
@@ -149,7 +149,29 @@
     Gracias por confiar en nosotros. <br>
     CIELO RAZOS PVC – Calidad que resalta tu techo.
   </div>
+  <script>
+           // Obtener los parámetros de la URL
+   const params = new URLSearchParams(window.location.search);
 
+          // Declarar variable con el valor del parámetro
+  
+    const fecha = params.get('fecha') || "fecha no especificada";
+    const cliente = params.get('cliente') || "cliente no especificada";
+    const sucursal = pamams.get('sucursal')  || " sucursalsucursal no especificada" 
+
+              // Mostrar en el HTML
+     document.getElementById("fecha").textContent = fecha;
+     document.getElementById("cliente").textContent = cliente;
+     document.getElementById("sucursal").textContent = sucursal;
+    
+ // 👉 Llamar automáticamente al abrir la página
+  window.onload = () => {
+  window.print();
+};
+    </script>
+
+
+  
   <script>
     function compartir() {
       if (navigator.share) {
