@@ -73,7 +73,7 @@
     </div>
 
     <div class="company-info">
-     <strong>CIELO RAZOS  PVC 1.0</strong><br>
+     <strong>CIELO RAZOS  PVC 1.1</strong><br>
      <strong>Nit:</strong> <span id="nit"></span><br>
      <div id="direccion"></div>
      <div id="telefono"></div>
@@ -194,25 +194,7 @@
 
 
   
-  <script>
-    function compartir() {
-      if (navigator.share) {
-        navigator.share({
-          title: 'Cotización - CIELO RAZOS PVC ',
-          text: 'Consulta esta cotización de cielo rasos.',
-          url: window.location.href
-        })
-        .then(() => console.log('Compartido correctamente'))
-        .catch((error) => console.error('Error al compartir:', error));
-      } else {
-        alert('La opción de compartir no está disponible en este dispositivo.');
-      }
-    }
-  </script>
-<div class="ticket">
-    <div class="btn-compartir" id="btnCompartir">
-      <img src="https://raw.githubusercontent.com/ever360/FacAlquiler1/main/share-button-.png" alt="Compartir">
-    </div>
+ 
  <!-- Librería para convertir HTML a imagen -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
