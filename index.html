@@ -82,7 +82,7 @@
         </svg>
       </div>
       <div class="company-info">
-        <strong>CIELO RAZOS PVC 1.3</strong><br>
+        <strong>CIELO RAZOS PVC 1.4</strong><br>
         <strong>Nit:</strong> <span id="nit"></span><br>
         <div id="direccion"></div>
         <div id="telefono"></div>
@@ -163,33 +163,30 @@
       window.print();
     };
 
-    function compartir() {
-      const elemento = document.getElementById("cotizacion");
-      html2canvas(elemento, { scale: 2 }).then(canvas => {
-        const imagenData = canvas.toDataURL("image/png");
-        const ventana = window.open();
-        ventana.document.write('<img src="' + imagenData + '" style="width:100%">');
-      });
-    }
+   
+  async function compartir() {
+    const elemento = document.getElementById("cotizacion");
+    const canvas = await html2canvas(elemento, { scale: 2 });
 
-    async function guardarPDF() {
-      const { jsPDF } = window.jspdf;
-      const elemento = document.getElementById("cotizacion");
+    canvas.toBlob(async function (blob) {
+      const file = new File([blob], "cotizacion.png", { type: "image/png" });
 
-      html2canvas(elemento, { scale: 2 }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'mm', 'a4');
-
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const imgWidth = pdfWidth;
-        const imgHeight = canvas.height * imgWidth / canvas.width;
-
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-        pdf.save('cotizacion.pdf');
-      });
-    }
-  </script>
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            title: "Cotización Cielo Rasos PVC",
+            text: "Adjunto la cotización solicitada.",
+            files: [file],
+          });
+        } catch (err) {
+          alert("Compartir cancelado o falló: " + err.message);
+        }
+      } else {
+        alert("Tu dispositivo no admite compartir archivos. Intenta desde un móvil.");
+      }
+    }, 'image/png');
+  }
+</script>
 
 </body>
 </html>
