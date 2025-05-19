@@ -84,10 +84,10 @@
     </div>
 
     <div class="company-info">
-      <strong>CIELO RAZOS  PVC 1.1</strong><br>
-      Calle 123, Ciudad<br>
-      Tel: 123-456-7890<br>
-     DIRECION CALLE 11-11
+     <strong>CIELO RAZOS  PVC 1.1</strong><br>
+     <strong>Nit:</strong> <span id="nit"></span><br>
+     <div id="direccion"></div>
+     <div id="telefono"></div>
      <div id="sucursal"></div>
     </div>
    
@@ -97,11 +97,11 @@
 
   <p><strong>Cliente:</strong><span id="cliente"></span> <br>
      <strong>Fecha:</strong> <span id="fecha"></span><br>
-     <strong>Dirección:</strong> Av. Principal #456, Ciudad</p>
+     <strong>Dirección:</strong><span id="direcioncliente"></span></p>
      <BR>
-     <P>
-       Para 50 mts cuadrdos la cantidad sugerida es de
-     </P>
+    <p>
+  Según su solicitud de <strong><span id="metros"></span> m²</strong>, recomendamos la siguiente cantidad de materiales:
+</p>
 
   <table>
     <tr>
@@ -110,39 +110,39 @@
     </tr>
     <tr>
       <td>LAMINAS </td>
-      <td>30</td>
+      <td ID="laminas"></td>
     </tr>
     <tr>
       <td>PERIMETRALES</td>
-      <td>3</td>
+      <td id="perimetrales"></td>
     </tr>
      <tr>
       <td>OMEGAS</td>
-      <td>3</td>
+      <td id="omegas"></td>
     </tr>
      <tr>
       <td>VIGUETAS</td>
-      <td>3</td>
+      <td id="viguetas"></td>
     </tr>
      <tr>
       <td>ANGULOS</td>
-      <td>3</td>
+      <td id="angulos"></td>
     </tr>
     <tr>
       <td>TORNILLOS</td>
-      <td>100</td>     
+      <td id="tornillos"></td>     
     </tr>
   </table>
 
   <div class="totals">
-    <p><strong>Subtotal:</strong> $455.00</p>
-    <p><strong>Instalación:</strong> $54.60</p>
-    <p><strong>Total:</strong> <strong>$ 509.60</strong></p>
+    <p><strong>Costo materiales:</strong> <span id="costomateriales"></span> </p>
+    <p><strong>Instalación:</strong><span id="instalacion"></span></p>
+    <p><strong>Total:</strong> <strong> <span id="total"></span> </strong></p>
   </div>
 
   <div class="observaciones">
     <p><strong>Observaciones:</strong></p>
-    <p>Esta cotización tiene una validez de 5 días. Los precios pueden variar según disponibilidad. No incluye instalación.</p>
+    <p id="Observaciones"></p>
   </div>
 
   <button class="btn-compartir" onclick="compartir()">Compartir cotización</button>
@@ -156,15 +156,45 @@
    const params = new URLSearchParams(window.location.search);
 
           // Declarar variable con el valor del parámetro
-  
+    const nit = params.get('nit')  || " nit no especificado"
+    const direccion = params.get('direccion')  || " direccion no especificada"
+    const telefono = params.get('telefono')  || " telefono no especificado"
+    const sucursal = params.get('sucursal')  || " sucursal no especificada"
     const fecha = params.get('fecha') || "fecha no especificada";
-    const cliente = params.get('cliente') || "cliente no especificada";
-    const sucursal = params.get('sucursal')  || " sucursal no especificada" 
+    const cliente = params.get('cliente') || "cliente no especificado";
+    const direcioncliente = params.get('direcioncliente') || "NO especificada";
+    const metros = params.get('metros') || "0";
+    const laminas = params.get('laminas')  || "0"
+    const perimetrales = params.get('perimetrales')  || "0"
+    const omegas = params.get('omegas')  || "0"
+    const viguetas = params.get('viguetas')  || "0"
+    const angulos = params.get('angulos') || "0";
+    const tornillos = params.get('tornillos') || "0";
+    const costomateriales = params.get('costomateriales') || "$ 0.00";
+    const instalacion = params.get('instalacion') || "$ 0.00";
+    const total = params.get('total') || "$ 0.00";
+    const Observaciones = params.get('Observaciones') || "No hay Observaciones";
+
 
               // Mostrar en el HTML
+     document.getElementById("nit").textContent = nit;
+     document.getElementById("direccion").textContent = direccion;
+     document.getElementById("telefono").textContent = telefono;
+     document.getElementById("sucursal").textContent = sucursal;
      document.getElementById("fecha").textContent = fecha;
      document.getElementById("cliente").textContent = cliente;
-     document.getElementById("sucursal").textContent = sucursal;
+     document.getElementById("direcioncliente").textContent = direcioncliente;
+     document.getElementById("metros").textContent = metros;
+     document.getElementById("laminas").textContent = laminas;
+     document.getElementById("perimetrales").textContent = perimetrales;
+     document.getElementById("omegas").textContent = omegas;
+     document.getElementById("viguetas").textContent = viguetas;
+     document.getElementById("angulos").textContent = angulos;
+     document.getElementById("tornillos").textContent = tornillos;
+     document.getElementById("costomateriales").textContent = costomateriales;
+     document.getElementById("instalacion").textContent = instalacion; 
+     document.getElementById("metros").textContent = metros; 
+     document.getElementById("Observaciones").textContent = Observaciones; 
     
  // 👉 Llamar automáticamente al abrir la página
   window.onload = () => {
