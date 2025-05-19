@@ -73,7 +73,7 @@
     </div>
 
     <div class="company-info">
-     <strong>CIELO RAZOS  PVC 1.1</strong><br>
+     <strong>CIELO RAZOS  PVC 1.2</strong><br>
      <strong>Nit:</strong> <span id="nit"></span><br>
      <div id="direccion"></div>
      <div id="telefono"></div>
@@ -134,7 +134,7 @@
     <p id="Observaciones"></p>
   </div>
 
-  <button class="btn-compartir" onclick="compartir()">Compartir cotización</button>
+  <button class="btnCompartir" onclick="compartir()">Compartir cotización</button>
 
   <div class="footer">
     Gracias por confiar en nosotros. <br>
@@ -199,27 +199,28 @@
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
-  function compartir() {
-    // Selecciona el cuerpo del documento, o el contenedor que quieres convertir en imagen
-    const elemento = document.body;
+        document.getElementById('btnCompartir').addEventListener('click', function() {
+            const facturaElement = document.querySelector('.ticket');
 
-    html2canvas(elemento, { scale: 2 }).then(canvas => {
-      // Convertir a imagen base64
-      const imagen = canvas.toDataURL("image/png");
+            html2canvas(facturaElement).then(function(canvas) {
+                canvas.toBlob(function(blob) {
+                    const file = new File([blob], "factura.png", { type: "image/png" });
 
-      // Crear un enlace para descargar o abrir
-      const enlace = document.createElement('a');
-      enlace.href = imagen;
-      enlace.download = "cotizacion.png"; // para descargar
-
-      // Si prefieres abrir en otra pestaña:
-      // window.open(imagen);
-
-      // Descomenta la siguiente línea para forzar descarga automática:
-      enlace.click();
-    });
-  }
-</script>
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: 'Comprobante de Pago',
+                            text: 'Aquí tienes tu comprobante de pago.',
+                        })
+                        .then(() => console.log('Compartido correctamente.'))
+                        .catch((error) => console.log('Error al compartir:', error));
+                    } else {
+                        alert("Tu navegador no soporta la API de compartición.");
+                    }
+                });
+            });
+        });
+    </script>
     
   
 
