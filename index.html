@@ -109,13 +109,13 @@
 
 <div class="ticket" id="ticket">
   <!-- Botón compartir -->
-  <div class="btn-compartir no-print" id="btnCompartir">
+  <div class="btn-compartir no-print" id="btnCompartir" title="Compartir PDF">
     <img src="https://raw.githubusercontent.com/ever360/FacAlquiler1/main/share-button-.png" alt="Compartir">
   </div>
 
   <!-- Encabezado -->
   <div class="ticket-header">
-    <h2>Cotización 1.0</h2>
+    <h2>Cotización 1.1</h2>
     <div class="svg-logo">
       <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
         <polygon points="60,140 60,30 90,30 90,150" fill="blue"/>
@@ -180,11 +180,11 @@
 
 <!-- Botones -->
 <button id="downloadPDF" class="no-print">Descargar PDF</button>
+
 <!-- Librerías -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<!-- Scripts -->
 <script>
   const params = new URLSearchParams(window.location.search);
   const getParam = (key, fallback = 'No especificado') => params.get(key) || fallback;
@@ -202,43 +202,57 @@
     });
   };
 
-  // Compartir imagen
-  document.getElementById('btnCompartir').addEventListener('click', () => {
-    const facturaElement = document.querySelector('.ticket');
-    html2canvas(facturaElement).then(canvas => {
-      canvas.toBlob(blob => {
-        const file = new File([blob], "factura.png", { type: "image/png" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({
-            files: [file],
-            title: 'Comprobante de Pago',
-            text: 'Aquí tienes tu comprobante de pago.',
-          }).catch(err => console.log('Error al compartir:', err));
-        } else {
-          alert("Tu navegador no soporta la API de compartición.");
-        }
-      });
-    });
-  });
+  // Función para generar PDF y devolverlo como Blob
+  async function generatePDF() {
+    const ticket = document.getElementById('ticket');
+    const canvas = await html2canvas(ticket);
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jspdf.jsPDF();
+    const width = pdf.internal.pageSize.getWidth();
+    const height = (canvas.height * width) / canvas.width;
+    pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+    const pdfBlob = pdf.output('blob');
+    return pdfBlob;
+  }
 
   // Descargar PDF
-  document.getElementById('downloadPDF').addEventListener('click', () => {
-    const cliente = document.getElementById('cliente').textContent || 'cotizacion';
-    const ticket = document.getElementById('ticket');
-    html2canvas(ticket).then(canvas => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jspdf.jsPDF();
-      const width = pdf.internal.pageSize.getWidth();
-      const height = (canvas.height * width) / canvas.width;
-      pdf.addImage(imgData, 'PNG', 0, 0, width, height);
-      pdf.save(`cotizacion_${cliente}.pdf`);
-    });
+  document.getElementById('downloadPDF').addEventListener('click', async () => {
+    const cliente = document.getElementById('cliente').textContent.trim() || 'cotizacion';
+    const pdfBlob = await generatePDF();
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    const a = document.createElement('a');
+    a.href = pdfUrl;
+    a.download = `cotizacion_${cliente}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(pdfUrl);
+  });
+
+  // Compartir PDF
+  document.getElementById('btnCompartir').addEventListener('click', async () => {
+    if (!navigator.canShare || !navigator.canShare({ files: [] })) {
+      alert('Tu navegador no soporta la función de compartir archivos.');
+      return;
+    }
+    try {
+      const cliente = document.getElementById('cliente').textContent.trim() || 'cotizacion';
+      const pdfBlob = await generatePDF();
+      const file = new File([pdfBlob], `cotizacion_${cliente}.pdf`, { type: 'application/pdf' });
+      await navigator.share({
+        files: [file],
+        title: 'Cotización PDF',
+        text: `Aquí tienes la cotización de ${cliente}.`,
+      });
+    } catch (error) {
+      console.error('Error al compartir:', error);
+    }
   });
 
   // Autoimprimir al abrir
   window.onload = () => {
     fillData();
-    window.print();
+    // window.print();  // Opcional: quitar para no imprimir automáticamente
   };
 </script>
 
