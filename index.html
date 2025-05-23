@@ -2,243 +2,245 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cotización - Cielo Rasos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ticket_kapital</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      color: #333;
-      font-size: 16px;
-      line-height: 1.4;
-    }
-    #cotizacion {
-      max-width: 700px;
+    .ticket {
+      font-family: monospace;
+      font-size: 12px;
+      width: 280px;
       margin: 0 auto;
-      padding: 0 10px;
-      box-sizing: border-box;
+      border: 1px solid #000;
+      padding: 10px;
+      position: relative;
     }
-    .header {
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 4px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    .ticket-header, .ticket-footer {
+      text-align: center;
+    }
+    .ticket-header h2, .ticket-footer p {
+      margin: 5px 0;
+      color: #007BFF;
+      font-size: 30px;
+    }
+    .ticket1-header h2, .ticket-footer p {
+      margin: 5px 0;
+      color: #007BFF;
+      font-size: 18px;
+    }
+    .divider {
+      border-top: 1px dashed #000;
+      margin: 10px 0;
+    }
+    .item {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid #007BFF;
-      padding-bottom: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
+      margin-bottom: 3px;
+    }
+    .item span {
+      flex: 1;
+    }
+    .subtotal, .total {
+      font-weight: bold;
+    }
+    .logo {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .logo img {
+      width: 70px;
+      height: auto;
+    }
+    .btn-compartir {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 25px;
+      cursor: pointer;
+    }
+    .btn-compartir img {
+      width: 100%;
+      height: auto;
+    }
+    #printButton, #downloadPDF {
+      display: block;
+      margin: 10px auto;
+      padding: 5px 10px;
+      font-size: 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
     }
     .svg-logo {
       width: 120px;
       height: auto;
       flex-shrink: 0;
-    }
-    .company-info {
-      text-align: right;
-      flex: 1 1 auto;
-      min-width: 180px;
-    }
-    h1 {
-      text-align: center;
-      color: #007BFF;
-      font-size: 1.8rem;
-      margin: 15px 0;
-    }
-    p {
-      font-size: 1rem;
-      margin: 8px 0;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      font-size: 1rem;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px 10px;
-      text-align: left;
-      word-break: break-word;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
     th {
       background-color: #007BFF;
       color: white;
     }
-    /* Hacer la tabla scrollable en móvil */
-    .table-wrapper {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .totals {
-      text-align: right;
-      margin-top: 20px;
-      font-size: 1rem;
-    }
-    .observaciones {
-      margin-top: 30px;
-      font-size: 1rem;
-    }
-    .footer {
+    td:nth-child(2), th:nth-child(2) {
       text-align: center;
-      margin-top: 50px;
-      font-size: 0.9rem;
-      color: gray;
     }
-    .btnCompartir {
-      display: block;
-      margin: 20px auto;
-      padding: 10px 20px;
-      font-size: 1rem;
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      max-width: 300px;
-      width: 100%;
+    
+    @media print {
+     .no-print {
+     display: none !important;
     }
+  }
+
   </style>
 </head>
 <body>
 
-  <div id="cotizacion">
-    <div class="header">
-      <div class="svg-logo">
-        <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
-          <polygon points="60,140 60,30 90,30 90,150" fill="blue" />
-          <polygon points="50,40 50,30 190,-20 89,50" fill="red" />
-          <line x1="150" y2="5" x2="250" y3="200" style="stroke:red;stroke-width:8" />
-          <text x="140" y="60" fill="blue" font-size="45">PVC</text>
-          <text x="110" y="110" fill="red" font-size="33">CIELO RAZOS</text>
-        </svg>
-      </div>
-      <div class="company-info">
-        <strong>CIELO RAZOS PVC </strong><br />
-        <strong>Nit:</strong> <span id="nit"></span><br />
-        <div id="direccion"></div>
-        <div id="telefono"></div>
-        <div id="sucursal"></div>
-      </div>
+<div class="ticket" id="ticket">
+  <!-- Botón compartir -->
+  <div class="btn-compartir no-print" id="btnCompartir">
+    <img src="https://raw.githubusercontent.com/ever360/FacAlquiler1/main/share-button-.png" alt="Compartir">
+  </div>
+
+  <!-- Encabezado -->
+  <div class="ticket-header">
+    <h2>Cotización</h2>
+    <div class="svg-logo">
+      <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="60,140 60,30 90,30 90,150" fill="blue"/>
+        <polygon points="50,40 50,30 190,-20 89,50" fill="red"/>
+        <line x1="150" y2="5" x2="250" y3="200" style="stroke:red;stroke-width:8"/>
+        <text x="140" y="60" fill="blue" font-size="45">PVC</text>
+        <text x="110" y="110" fill="red" font-size="33">CIELO RAZOS</text>
+      </svg>
     </div>
+     
+    <h3 id="sucursal"></h3>
+    <div><b>Nit:</b> <span id="nit"></span></div>
+    <div><b>Teléfono:</b> <span id="telefono"></span></div>
+    <div><b>Dirección:</b> <span id="direccion"></span></div>
+  </div>
 
-    <h1>COTIZACIÓN</h1>
+  <div class="divider"></div>
 
+  <!-- Cliente -->
+  <div class="ticket-items">
     <p>
       <strong>Cliente:</strong> <span id="cliente"></span><br />
       <strong>Fecha:</strong> <span id="fecha"></span><br />
-      <strong>Id cotizacion:</strong> <span id="id"></span>
+      <strong>Id cotización:</strong> <span id="id"></span>
     </p>
-
-    <p>
-      Según su solicitud de <strong><span id="metros"></span> m²</strong>, recomendamos la siguiente cantidad de materiales:
-    </p>
-
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr><th>Producto</th><th>Cantidad</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>LÁMINAS</td><td id="laminas"></td></tr>
-          <tr><td>PERIMETRALES</td><td id="perimetrales"></td></tr>
-          <tr><td>OMEGAS</td><td id="omegas"></td></tr>
-          <tr><td>VIGUETAS</td><td id="viguetas"></td></tr>
-          <tr><td>ÁNGULOS</td><td id="angulos"></td></tr>
-          <tr><td>TORNILLOS</td><td id="tornillos"></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="totals">
-      <p><strong>Costo materiales:</strong> <span id="costomateriales"></span></p>
-      <p><strong>Instalación:</strong> <span id="instalacion"></span></p>
-      <p><strong>Total:</strong> <strong><span id="total"></span></strong></p>
-    </div>
-
-    <div class="observaciones">
-      <p><strong>Observaciones:</strong></p>
-      <p id="Observaciones"></p>
-    </div>
+    <div class="divider"></div>
+    <p>Según su solicitud de <strong><span id="metros"></span> m²</strong>, recomendamos la siguiente cantidad de materiales:</p>
   </div>
 
-  <button class="btnCompartir" onclick="compartir()">Compartir cotización</button>
-  <button class="btnCompartir" onclick="guardarPDF()">Guardar como PDF</button>
+  <!-- Tabla -->
+  <table>
+    <thead>
+      <tr><th>Producto</th><th>Cantidad</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>LÁMINAS</td><td id="laminas"></td></tr>
+      <tr><td>PERIMETRALES</td><td id="perimetrales"></td></tr>
+      <tr><td>OMEGAS</td><td id="omegas"></td></tr>
+      <tr><td>VIGUETAS</td><td id="viguetas"></td></tr>
+      <tr><td>ÁNGULOS</td><td id="angulos"></td></tr>
+      <tr><td>TORNILLOS</td><td id="tornillos"></td></tr>
+    </tbody>
+  </table>
 
-  <div class="footer">
-    Gracias por confiar en nosotros. <br />
+  <br />
+
+  <!-- Totales -->
+  <div class="ticket1-footer">
+    <p style="text-align: right;"><strong>Costo materiales:</strong> <span id="costomateriales"></span></p>
+    <p style="text-align: right;"><strong>Instalación:</strong> <span id="instalacion"></span></p>
+    <p style="text-align: right;"><strong>Total:</strong> <strong><span id="total"></span></strong></p>
+
+    <h5>Observaciones</h5>
+    <p id="Observaciones"></p>
+  </div>
+
+  <div class="footer" style="text-align: center; margin-top: 10px;">
+    Gracias por confiar en nosotros.<br/>
     CIELO RAZOS PVC – Calidad que resalta tu techo.
   </div>
+</div>
 
-  <!-- Librerías necesarias -->
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- Botones -->
+<button id="downloadPDF" class="no-print">Descargar PDF</button>
+<!-- Librerías -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const getParam = (key, fallback = 'No especificado') => params.get(key) || fallback;
+<!-- Scripts -->
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const getParam = (key, fallback = 'No especificado') => params.get(key) || fallback;
 
-    document.getElementById("nit").textContent = getParam('nit');
-    document.getElementById("direccion").textContent = getParam('direccion');
-    document.getElementById("telefono").textContent = getParam('telefono');
-    document.getElementById("sucursal").textContent = getParam('sucursal');
-    document.getElementById("fecha").textContent = getParam('fecha');
-    document.getElementById("cliente").textContent = getParam('cliente');
-    document.getElementById("id").textContent = getParam('id');
-    document.getElementById("direcioncliente").textContent = getParam('direcioncliente');
-    document.getElementById("metros").textContent = getParam('metros');
-    document.getElementById("laminas").textContent = getParam('laminas');
-    document.getElementById("perimetrales").textContent = getParam('perimetrales');
-    document.getElementById("omegas").textContent = getParam('omegas');
-    document.getElementById("viguetas").textContent = getParam('viguetas');
-    document.getElementById("angulos").textContent = getParam('angulos');
-    document.getElementById("tornillos").textContent = getParam('tornillos');
-    document.getElementById("costomateriales").textContent = getParam('costomateriales');
-    document.getElementById("instalacion").textContent = getParam('instalacion');
-    document.getElementById("total").textContent = getParam('total');
-    document.getElementById("Observaciones").textContent = getParam('Observaciones', 'No hay observaciones');
+  const fillData = () => {
+    const ids = [
+      "nit","sucursal", "direccion", "telefono", "fecha", "cliente", "id", "metros",
+      "laminas", "perimetrales", "omegas", "viguetas", "angulos", "tornillos",
+      "costomateriales", "instalacion", "total", "Observaciones"
+    ];
+    ids.forEach(id => {
+      const value = getParam(id, 'N/A');
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    });
+  };
 
-    // window.onload = () => { window.print(); }; // Comentado para que no imprima automáticamente
-
-    async function compartir() {
-      const elemento = document.getElementById("cotizacion");
-      const canvas = await html2canvas(elemento, { scale: 2, scrollY: -window.scrollY });
-
-      canvas.toBlob(async function (blob) {
-        const file = new File([blob], "cotizacion.png", { type: "image/png" });
-
+  // Compartir imagen
+  document.getElementById('btnCompartir').addEventListener('click', () => {
+    const facturaElement = document.querySelector('.ticket');
+    html2canvas(facturaElement).then(canvas => {
+      canvas.toBlob(blob => {
+        const file = new File([blob], "factura.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({
-              title: "Cotización Cielo Rasos PVC",
-              text: "Adjunto la cotización solicitada.",
-              files: [file],
-            });
-          } catch (err) {
-            alert("Compartir cancelado o falló: " + err.message);
-          }
+          navigator.share({
+            files: [file],
+            title: 'Comprobante de Pago',
+            text: 'Aquí tienes tu comprobante de pago.',
+          }).catch(err => console.log('Error al compartir:', err));
         } else {
-          alert("Tu dispositivo no admite compartir archivos. Intenta desde un móvil.");
+          alert("Tu navegador no soporta la API de compartición.");
         }
-      }, 'image/png');
-    }
-
-    function guardarPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      html2canvas(document.getElementById("cotizacion"), { scale: 2 }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const imgProps = doc.getImageProperties(imgData);
-        const pdfWidth = doc.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-        doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        doc.save("cotizacion.pdf");
       });
-    }
-    // 👉 Llamar automáticamente al abrir la página
+    });
+  });
+
+  // Descargar PDF
+  document.getElementById('downloadPDF').addEventListener('click', () => {
+    const cliente = document.getElementById('cliente').textContent || 'cotizacion';
+    const ticket = document.getElementById('ticket');
+    html2canvas(ticket).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jspdf.jsPDF();
+      const width = pdf.internal.pageSize.getWidth();
+      const height = (canvas.height * width) / canvas.width;
+      pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+      pdf.save(`cotizacion_${cliente}.pdf`);
+    });
+  });
+
+  // Autoimprimir al abrir
   window.onload = () => {
-  window.print();
-};
-  </script>
+    fillData();
+    window.print();
+  };
+</script>
+
 </body>
 </html>
