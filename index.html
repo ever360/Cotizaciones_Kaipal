@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+ <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -90,7 +91,7 @@
 
 <div class="ticket" id="ticket">
   <!-- Botón compartir -->
-  <div class="btn-compartir no-print" id="btnCompartir" title="Imprimir">
+  <div class="btn-compartir no-print" id="btnCompartir" title="Compartir PDF">
     <img src="https://raw.githubusercontent.com/ever360/FacAlquiler1/main/share-button-.png" alt="Compartir">
   </div>
 
@@ -117,6 +118,7 @@
   <div class="ticket-items">
     <p>
       <strong>Cliente:</strong> <span id="cliente"></span><br />
+     <strong>Telefono:</strong> <span id="Telcliente"></span><br />
       <strong>Fecha:</strong> <span id="fecha"></span><br />
       <strong>Id cotización:</strong> <span id="id"></span>
     </p>
@@ -166,9 +168,9 @@
 
   const fillData = () => {
     const ids = [
-      "nit","sucursal", "direccion", "telefono", "fecha", "cliente", "id", "metros",
+      "nit","sucursal", "direccion", "telefono", "fecha", "cliente","Telcliente","id", "metros",
       "laminas", "perimetrales", "omegas", "viguetas", "angulos", "tornillos",
-      "costomateriales", "instalacion", "total", "Observaciones"
+      "costomateriales", "instalacion", "total", "Observaciones", "Telcliente"
     ];
     ids.forEach(id => {
       const el = document.getElementById(id);
@@ -176,40 +178,188 @@
     });
   };
 
-  // Botón compartir: solo abre impresión
+  // Función para generar nombre del archivo PDF
+  const generatePDFName = () => {
+    const cliente = document.getElementById('cliente').textContent.trim() || 'cliente';
+    const sucursal = document.getElementById('sucursal').textContent.trim() || 'ciudad';
+    
+    // Limpiar caracteres especiales para el nombre del archivo
+    const clienteLimpio = cliente.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
+    const sucursalLimpia = sucursal.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
+    
+    return `cotizacion_${clienteLimpio}_PVC_${sucursalLimpia}.pdf`;
+  };
+
+  // Función para generar PDF y compartir
+  const generateAndSharePDF = () => {
+    return new Promise((resolve, reject) => {
+      try {
+        const ticket = document.getElementById('ticket');
+        
+        html2canvas(ticket, { 
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          width: 280,
+          height: ticket.scrollHeight,
+          scrollX: 0,
+          scrollY: 0,
+          backgroundColor: '#ffffff'
+        }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          
+          // Dimensiones del PDF en mm
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = pdf.internal.pageSize.getHeight();
+          
+          // Dimensiones del canvas en píxeles
+          const canvasWidth = canvas.width;
+          const canvasHeight = canvas.height;
+          
+          // Calcular dimensiones para centrar y ajustar el contenido
+          const ratio = Math.min(pdfWidth / (canvasWidth * 0.264583), pdfHeight / (canvasHeight * 0.264583));
+          const imgWidth = (canvasWidth * 0.264583) * ratio;
+          const imgHeight = (canvasHeight * 0.264583) * ratio;
+          
+          // Centrar horizontalmente
+          const xPosition = (pdfWidth - imgWidth) / 2;
+          const yPosition = 10; // Margen superior
+
+          pdf.addImage(imgData, 'PNG', xPosition, yPosition, imgWidth, imgHeight);
+          
+          // Obtener el PDF como blob
+          const pdfBlob = pdf.output('blob');
+          const fileName = generatePDFName();
+          
+          // Verificar si el navegador soporta Web Share API
+          if (navigator.share && navigator.canShare) {
+            const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+            
+            if (navigator.canShare({ files: [file] })) {
+              navigator.share({
+                title: 'Cotización PVC',
+                text: 'Cotización de materiales PVC',
+                files: [file]
+              }).then(() => {
+                console.log('PDF compartido exitosamente');
+                resolve();
+              }).catch(error => {
+                console.log('Compartir cancelado o error:', error);
+                // Fallback: descargar el archivo
+                downloadPDFBlob(pdfBlob, fileName);
+                resolve();
+              });
+            } else {
+              // Fallback: crear enlace de descarga
+              downloadPDFBlob(pdfBlob, fileName);
+              resolve();
+            }
+          } else {
+            // Fallback: crear enlace de descarga
+            downloadPDFBlob(pdfBlob, fileName);
+            resolve();
+          }
+        }).catch(error => {
+          console.error('Error con html2canvas:', error);
+          reject(error);
+        });
+      } catch (error) {
+        console.error('Error en generateAndSharePDF:', error);
+        reject(error);
+      }
+    });
+  };
+
+  // Función auxiliar para descargar PDF como fallback
+  const downloadPDFBlob = (blob, fileName) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Función para generar PDF (solo descarga)
+  const generatePDF = () => {
+    return new Promise((resolve, reject) => {
+      try {
+        const ticket = document.getElementById('ticket');
+        
+        html2canvas(ticket, { 
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          width: 280,
+          height: ticket.scrollHeight,
+          scrollX: 0,
+          scrollY: 0,
+          backgroundColor: '#ffffff'
+        }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          
+          // Dimensiones del PDF en mm
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = pdf.internal.pageSize.getHeight();
+          
+          // Dimensiones del canvas en píxeles
+          const canvasWidth = canvas.width;
+          const canvasHeight = canvas.height;
+          
+          // Calcular dimensiones para centrar y ajustar el contenido
+          const ratio = Math.min(pdfWidth / (canvasWidth * 0.264583), pdfHeight / (canvasHeight * 0.264583));
+          const imgWidth = (canvasWidth * 0.264583) * ratio;
+          const imgHeight = (canvasHeight * 0.264583) * ratio;
+          
+          // Centrar horizontalmente
+          const xPosition = (pdfWidth - imgWidth) / 2;
+          const yPosition = 10; // Margen superior
+
+          pdf.addImage(imgData, 'PNG', xPosition, yPosition, imgWidth, imgHeight);
+          const fileName = generatePDFName();
+          pdf.save(fileName);
+          resolve();
+        }).catch(error => {
+          reject(error);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+
+  // Botón compartir: genera PDF y abre diálogo de compartir
   document.getElementById('btnCompartir').addEventListener('click', () => {
-    window.print();
+    try {
+      generateAndSharePDF().then(() => {
+        console.log('Proceso de compartir completado');
+      }).catch(error => {
+        console.error('Error compartiendo PDF:', error);
+        alert('Error al generar o compartir el PDF. Tu navegador puede no soportar esta función.');
+      });
+    } catch (error) {
+      console.error('Error en botón compartir:', error);
+      alert('Error al compartir. Por favor, intenta con el botón de descarga.');
+    }
   });
 
-  // Botón descargar PDF
-  document.getElementById('downloadPDF').addEventListener('click', async () => {
-    const ticket = document.getElementById('ticket');
-    const canvas = await html2canvas(ticket, { scale: 2 }); // Mejor resolución
-
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-
-    // Ajustar la altura proporcional
-    const imgProps = {
-      width: canvas.width,
-      height: canvas.height
-    };
-
-    const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
-    const imgWidth = imgProps.width * ratio;
-    const imgHeight = imgProps.height * ratio;
-
-    const position = 0;
-
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    const cliente = document.getElementById('cliente').textContent.trim() || 'cotizacion';
-    pdf.save(`cotizacion_${cliente}.pdf`);
+  // Botón descargar PDF (mantiene la funcionalidad original)
+  document.getElementById('downloadPDF').addEventListener('click', () => {
+    generatePDF().catch(error => {
+      console.error('Error descargando PDF:', error);
+      alert('Error al generar el PDF. Por favor, intenta de nuevo.');
+    });
   });
 
   window.onload = fillData;
 </script>
 
 </body>
-</html>
+</html
