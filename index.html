@@ -357,8 +357,12 @@
       alert('Error al generar el PDF. Por favor, intenta de nuevo.');
     });
   });
-
+// Auto-print al cargar
+    window.onload = () => {
+        window.print();
+    };
   window.onload = fillData;
+ 
 </script>
 
 </body>
