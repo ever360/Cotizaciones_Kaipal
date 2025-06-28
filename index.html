@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cotizacion_kapital</title>
+  <title>Cotización_kapital</title>
   <style>
     .ticket {
       font-family: monospace;
@@ -14,7 +14,6 @@
       padding: 10px;
       position: relative;
       background: white;
-      box-sizing: border-box;
     }
     table {
       width: 100%;
@@ -42,38 +41,17 @@
       border-top: 1px dashed #000;
       margin: 10px 0;
     }
-    .share-buttons {
+    .btn-compartir {
       position: absolute;
       top: 5px;
       right: 5px;
-      display: flex;
-      gap: 5px;
+      width: 25px;
+      cursor: pointer;
       z-index: 10;
     }
-    .btn-share {
-      width: 25px;
-      height: 25px;
-      cursor: pointer;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      color: white;
-      text-decoration: none;
-      transition: transform 0.2s;
-    }
-    .btn-share:hover {
-      transform: scale(1.1);
-    }
-    .btn-pdf {
-      background-color: #DC3545;
-    }
-    .btn-whatsapp {
-      background-color: #25D366;
-    }
-    .btn-compartir {
-      background-color: #007BFF;
+    .btn-compartir img {
+      width: 100%;
+      height: auto;
     }
     #downloadPDF {
       display: block;
@@ -106,67 +84,19 @@
        display: none !important;
      }
     }
-    
-    /* Estilos para el modal de WhatsApp */
-    .whatsapp-modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.5);
-    }
-    
-    .modal-content {
-      background-color: white;
-      margin: 15% auto;
-      padding: 20px;
-      border-radius: 10px;
-      width: 300px;
-      text-align: center;
-    }
-    
-    .modal-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-      justify-content: center;
-    }
-    
-    .modal-btn {
-      padding: 8px 15px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    
-    .btn-confirm {
-      background-color: #25D366;
-      color: white;
-    }
-    
-    .btn-cancel {
-      background-color: #6c757d;
-      color: white;
-    }
   </style>
 </head>
 <body>
 
 <div class="ticket" id="ticket">
-  <!-- Botones de compartir -->
-  <div class="share-buttons no-print">
-    <div class="btn-share btn-pdf" id="btnPDF" title="Descargar PDF">📄</div>
-    <div class="btn-share btn-whatsapp" id="btnWhatsApp" title="Compartir por WhatsApp">📱</div>
-    <div class="btn-share btn-compartir" id="btnCompartir" title="Compartir">📤</div>
+  <!-- Botón compartir -->
+  <div class="btn-compartir no-print" id="btnCompartir" title="Imprimir">
+    <img src="https://raw.githubusercontent.com/ever360/FacAlquiler1/main/share-button-.png" alt="Compartir">
   </div>
 
-  <!-- Contenido del ticket -->
+  <!-- Contenido similar al anterior -->
   <div class="ticket-header">
-    <h2>Cotización 1.2</h2>
+    <h2>Cotización </h2>
     <div class="svg-logo">
       <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
         <polygon points="60,140 60,30 90,30 90,150" fill="blue"/>
@@ -187,7 +117,6 @@
   <div class="ticket-items">
     <p>
       <strong>Cliente:</strong> <span id="cliente"></span><br />
-     <strong>Telefono:</strong> <span id="Telcliente"></span><br />
       <strong>Fecha:</strong> <span id="fecha"></span><br />
       <strong>Id cotización:</strong> <span id="id"></span>
     </p>
@@ -228,20 +157,6 @@
 
 <button id="downloadPDF" class="no-print">Descargar PDF</button>
 
-<!-- Modal para WhatsApp -->
-<div id="whatsappModal" class="whatsapp-modal no-print">
-  <div class="modal-content">
-    <h3>📱 Enviar por WhatsApp</h3>
-    <p>¿Deseas enviar la cotización al cliente por WhatsApp?</p>
-    <p><strong>Cliente:</strong> <span id="modalCliente"></span></p>
-    <p><strong>Teléfono:</strong> <span id="modalTelefono"></span></p>
-    <div class="modal-buttons">
-      <button class="modal-btn btn-confirm" id="confirmWhatsApp">Enviar</button>
-      <button class="modal-btn btn-cancel" id="cancelWhatsApp">Cancelar</button>
-    </div>
-  </div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -251,7 +166,7 @@
 
   const fillData = () => {
     const ids = [
-      "nit","sucursal", "direccion", "telefono", "fecha", "cliente","Telcliente","id", "metros",
+      "nit","sucursal", "direccion", "telefono", "fecha", "cliente", "id", "metros",
       "laminas", "perimetrales", "omegas", "viguetas", "angulos", "tornillos",
       "costomateriales", "instalacion", "total", "Observaciones"
     ];
@@ -261,328 +176,36 @@
     });
   };
 
-  // Función para limpiar número de teléfono
-  const cleanPhoneNumber = (phone) => {
-    if (!phone || phone === 'N/A' || phone.trim() === '') return null;
-    
-    // Remover todos los caracteres que no sean números
-    let cleaned = phone.replace(/\D/g, '');
-    
-    console.log('Número original:', phone);
-    console.log('Número limpio:', cleaned);
-    
-    // Si ya tiene código de país 57
-    if (cleaned.startsWith('57') && cleaned.length >= 12) {
-      console.log('Número con código 57 detectado');
-      return cleaned;
-    }
-    
-    // Si es un número de 10 dígitos (celular colombiano completo)
-    if (cleaned.length === 10) {
-      console.log('Número de 10 dígitos, agregando código 57');
-      return '57' + cleaned;
-    }
-    
-    // Si es un número de 7 dígitos (fijo sin código de área)
-    if (cleaned.length === 7) {
-      console.log('Número de 7 dígitos, asumiendo Bogotá (601)');
-      return '5760' + cleaned; // Asume Bogotá, puedes cambiar por tu ciudad
-    }
-    
-    // Si es un número de 8 dígitos (podría ser celular sin los primeros dígitos)
-    if (cleaned.length === 8) {
-      console.log('Número de 8 dígitos, agregando 573');
-      return '573' + cleaned;
-    }
-    
-    // Si es un número de 9 dígitos (celular sin el 57)
-    if (cleaned.length === 9) {
-      console.log('Número de 9 dígitos, agregando 57');
-      return '57' + cleaned;
-    }
-    
-    // Para cualquier otro caso, si tiene al menos 7 dígitos, intentar usarlo
-    if (cleaned.length >= 7) {
-      console.log('Número de', cleaned.length, 'dígitos, agregando 57');
-      return '57' + cleaned;
-    }
-    
-    console.log('Número no válido');
-    return null;
-  };
-
-  // Función para generar nombre del archivo PDF
-  const generatePDFName = () => {
-    const cliente = document.getElementById('cliente').textContent.trim() || 'cliente';
-    const sucursal = document.getElementById('sucursal').textContent.trim() || 'ciudad';
-    
-    const clienteLimpio = cliente.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
-    const sucursalLimpia = sucursal.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
-    
-    return `cotizacion_${clienteLimpio}_PVC_${sucursalLimpia}.pdf`;
-  };
-
-  // Función mejorada para generar PDF
-  const generatePDF = () => {
-    return new Promise((resolve, reject) => {
-      try {
-        const ticket = document.getElementById('ticket');
-        
-        // Configuración mejorada para html2canvas
-        html2canvas(ticket, { 
-          scale: 3, // Aumentamos la escala para mejor calidad
-          useCORS: true,
-          allowTaint: true,
-          width: 300, // Aumentamos el ancho para evitar recortes
-          height: ticket.scrollHeight,
-          scrollX: 0,
-          scrollY: 0,
-          backgroundColor: '#ffffff',
-          x: 0,
-          y: 0,
-          foreignObjectRendering: true
-        }).then(canvas => {
-          const imgData = canvas.toDataURL('image/png', 1.0);
-          const { jsPDF } = window.jspdf;
-          const pdf = new jsPDF('p', 'mm', 'a4');
-          
-          // Configuración mejorada para el PDF
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = pdf.internal.pageSize.getHeight();
-          
-          // Convertir píxeles a mm (1px = 0.264583mm)
-          const imgWidth = (canvas.width * 0.264583) / 3; // Dividir por la escala
-          const imgHeight = (canvas.height * 0.264583) / 3;
-          
-          // Calcular escala para que quepa en la página con margen
-          const margin = 15; // Margen en mm
-          const maxWidth = pdfWidth - (margin * 2);
-          const maxHeight = pdfHeight - (margin * 2);
-          
-          const scaleX = maxWidth / imgWidth;
-          const scaleY = maxHeight / imgHeight;
-          const scale = Math.min(scaleX, scaleY, 1); // No agrandar más de lo original
-          
-          const finalWidth = imgWidth * scale;
-          const finalHeight = imgHeight * scale;
-          
-          // Centrar el contenido
-          const xPosition = (pdfWidth - finalWidth) / 2;
-          const yPosition = margin;
-
-          pdf.addImage(imgData, 'PNG', xPosition, yPosition, finalWidth, finalHeight);
-          
-          const fileName = generatePDFName();
-          pdf.save(fileName);
-          resolve({ pdf, fileName });
-        }).catch(error => {
-          console.error('Error con html2canvas:', error);
-          reject(error);
-        });
-      } catch (error) {
-        console.error('Error en generatePDF:', error);
-        reject(error);
-      }
-    });
-  };
-
-  // Función para generar PDF como blob (para compartir)
-  const generatePDFBlob = () => {
-    return new Promise((resolve, reject) => {
-      try {
-        const ticket = document.getElementById('ticket');
-        
-        html2canvas(ticket, { 
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
-          width: 300,
-          height: ticket.scrollHeight,
-          scrollX: 0,
-          scrollY: 0,
-          backgroundColor: '#ffffff',
-          x: 0,
-          y: 0,
-          foreignObjectRendering: true
-        }).then(canvas => {
-          const imgData = canvas.toDataURL('image/png', 1.0);
-          const { jsPDF } = window.jspdf;
-          const pdf = new jsPDF('p', 'mm', 'a4');
-          
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = pdf.internal.pageSize.getHeight();
-          
-          const imgWidth = (canvas.width * 0.264583) / 3;
-          const imgHeight = (canvas.height * 0.264583) / 3;
-          
-          const margin = 15;
-          const maxWidth = pdfWidth - (margin * 2);
-          const maxHeight = pdfHeight - (margin * 2);
-          
-          const scaleX = maxWidth / imgWidth;
-          const scaleY = maxHeight / imgHeight;
-          const scale = Math.min(scaleX, scaleY, 1);
-          
-          const finalWidth = imgWidth * scale;
-          const finalHeight = imgHeight * scale;
-          
-          const xPosition = (pdfWidth - finalWidth) / 2;
-          const yPosition = margin;
-
-          pdf.addImage(imgData, 'PNG', xPosition, yPosition, finalWidth, finalHeight);
-          
-          const pdfBlob = pdf.output('blob');
-          const fileName = generatePDFName();
-          
-          resolve({ blob: pdfBlob, fileName });
-        }).catch(error => {
-          reject(error);
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  };
-
-  // Función para compartir por WhatsApp
-  const shareWhatsApp = () => {
-    const clienteElement = document.getElementById('cliente');
-    const telefonoElement = document.getElementById('Telcliente');
-    
-    const cliente = clienteElement.textContent.trim();
-    const telefono = telefonoElement.textContent.trim();
-    
-    // Actualizar modal
-    document.getElementById('modalCliente').textContent = cliente || 'No especificado';
-    document.getElementById('modalTelefono').textContent = telefono || 'No especificado';
-    
-    // Mostrar modal
-    document.getElementById('whatsappModal').style.display = 'block';
-  };
-
-  // Función para generar enlace de WhatsApp
-  const generateWhatsAppLink = (phoneNumber) => {
-    const cliente = document.getElementById('cliente').textContent.trim() || 'Cliente';
-    const total = document.getElementById('total').textContent.trim() || 'N/A';
-    const fecha = document.getElementById('fecha').textContent.trim() || new Date().toLocaleDateString();
-    
-    const mensaje = `🏠 *COTIZACIÓN CIELO RAZOS PVC* 🏠
-
-Estimado/a ${cliente},
-
-Adjunto encontrará su cotización de materiales PVC:
-
-📋 *Detalles:*
-• Fecha: ${fecha}
-• Total: ${total}
-
-✅ *Incluye:*
-• Láminas PVC
-• Perimetrales 
-• Omegas
-• Viguetas
-• Ángulos
-• Tornillos
-
-👷‍♂️ *Instalación profesional incluida*
-
-Gracias por confiar en nosotros.
-*CIELO RAZOS PVC* - Calidad que resalta tu techo 🏆`;
-
-    const mensajeCodificado = encodeURIComponent(mensaje);
-    return `https://wa.me/${phoneNumber}?text=${mensajeCodificado}`;
-  };
-
-  // Event Listeners
-  document.getElementById('btnPDF').addEventListener('click', () => {
-    generatePDF().catch(error => {
-      console.error('Error descargando PDF:', error);
-      alert('Error al generar el PDF. Por favor, intenta de nuevo.');
-    });
-  });
-
-  document.getElementById('btnWhatsApp').addEventListener('click', shareWhatsApp);
-
+  // Botón compartir: solo abre impresión
   document.getElementById('btnCompartir').addEventListener('click', () => {
-    generatePDFBlob().then(({ blob, fileName }) => {
-      if (navigator.share && navigator.canShare) {
-        const file = new File([blob], fileName, { type: 'application/pdf' });
-        
-        if (navigator.canShare({ files: [file] })) {
-          navigator.share({
-            title: 'Cotización PVC',
-            text: 'Cotización de materiales PVC',
-            files: [file]
-          }).catch(error => {
-            console.log('Compartir cancelado:', error);
-            // Fallback: descargar
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            a.click();
-            URL.revokeObjectURL(url);
-          });
-        } else {
-          // Fallback
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = fileName;
-          a.click();
-          URL.revokeObjectURL(url);
-        }
-      } else {
-        // Fallback
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        a.click();
-        URL.revokeObjectURL(url);
-      }
-    }).catch(error => {
-      console.error('Error compartiendo:', error);
-      alert('Error al generar el PDF para compartir.');
-    });
+    window.print();
   });
 
-  document.getElementById('downloadPDF').addEventListener('click', () => {
-    generatePDF().catch(error => {
-      console.error('Error descargando PDF:', error);
-      alert('Error al generar el PDF. Por favor, intenta de nuevo.');
-    });
-  });
+  // Botón descargar PDF
+  document.getElementById('downloadPDF').addEventListener('click', async () => {
+    const ticket = document.getElementById('ticket');
+    const canvas = await html2canvas(ticket, { scale: 2 }); // Mejor resolución
 
-  // Modal WhatsApp event listeners
-  document.getElementById('confirmWhatsApp').addEventListener('click', () => {
-    const telefono = document.getElementById('Telcliente').textContent.trim();
-    console.log('Teléfono desde el campo:', telefono);
-    
-    const cleanedPhone = cleanPhoneNumber(telefono);
-    console.log('Teléfono procesado:', cleanedPhone);
-    
-    if (cleanedPhone) {
-      const whatsappUrl = generateWhatsAppLink(cleanedPhone);
-      console.log('URL de WhatsApp:', whatsappUrl);
-      window.open(whatsappUrl, '_blank');
-    } else {
-      alert(`Número de teléfono no válido: "${telefono}"\nPor favor, verifica que el número tenga al menos 7 dígitos.`);
-    }
-    
-    document.getElementById('whatsappModal').style.display = 'none';
-  });
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
 
-  document.getElementById('cancelWhatsApp').addEventListener('click', () => {
-    document.getElementById('whatsappModal').style.display = 'none';
-  });
+    // Ajustar la altura proporcional
+    const imgProps = {
+      width: canvas.width,
+      height: canvas.height
+    };
 
-  // Cerrar modal al hacer clic fuera
-  window.addEventListener('click', (event) => {
-    const modal = document.getElementById('whatsappModal');
-    if (event.target === modal) {
-      modal.style.display = 'none';
-    }
+    const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
+    const imgWidth = imgProps.width * ratio;
+    const imgHeight = imgProps.height * ratio;
+
+    const position = 0;
+
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    const cliente = document.getElementById('cliente').textContent.trim() || 'cotizacion';
+    pdf.save(`cotizacion_${cliente}.pdf`);
   });
 
   window.onload = fillData;
