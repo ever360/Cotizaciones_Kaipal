@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ticket_kapital</title>
+  <title>Cotizacion_kapital</title>
   <style>
     .ticket {
       font-family: monospace;
@@ -166,7 +166,7 @@
 
   <!-- Contenido del ticket -->
   <div class="ticket-header">
-    <h2>Cotización 1.0</h2>
+    <h2>Cotización 1.2</h2>
     <div class="svg-logo">
       <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
         <polygon points="60,140 60,30 90,30 90,150" fill="blue"/>
@@ -263,27 +263,52 @@
 
   // Función para limpiar número de teléfono
   const cleanPhoneNumber = (phone) => {
-    if (!phone || phone === 'N/A') return null;
+    if (!phone || phone === 'N/A' || phone.trim() === '') return null;
     
     // Remover todos los caracteres que no sean números
     let cleaned = phone.replace(/\D/g, '');
     
-    // Si empieza con 57 (código de Colombia), mantenerlo
-    if (cleaned.startsWith('57') && cleaned.length > 10) {
+    console.log('Número original:', phone);
+    console.log('Número limpio:', cleaned);
+    
+    // Si ya tiene código de país 57
+    if (cleaned.startsWith('57') && cleaned.length >= 12) {
+      console.log('Número con código 57 detectado');
       return cleaned;
     }
     
-    // Si es un número de 10 dígitos, agregar código de Colombia
+    // Si es un número de 10 dígitos (celular colombiano completo)
     if (cleaned.length === 10) {
+      console.log('Número de 10 dígitos, agregando código 57');
       return '57' + cleaned;
     }
     
-    // Si es un número de 7-9 dígitos, agregar código de área de Colombia y código de país
-    if (cleaned.length >= 7 && cleaned.length <= 9) {
+    // Si es un número de 7 dígitos (fijo sin código de área)
+    if (cleaned.length === 7) {
+      console.log('Número de 7 dígitos, asumiendo Bogotá (601)');
+      return '5760' + cleaned; // Asume Bogotá, puedes cambiar por tu ciudad
+    }
+    
+    // Si es un número de 8 dígitos (podría ser celular sin los primeros dígitos)
+    if (cleaned.length === 8) {
+      console.log('Número de 8 dígitos, agregando 573');
       return '573' + cleaned;
     }
     
-    return cleaned.length >= 7 ? cleaned : null;
+    // Si es un número de 9 dígitos (celular sin el 57)
+    if (cleaned.length === 9) {
+      console.log('Número de 9 dígitos, agregando 57');
+      return '57' + cleaned;
+    }
+    
+    // Para cualquier otro caso, si tiene al menos 7 dígitos, intentar usarlo
+    if (cleaned.length >= 7) {
+      console.log('Número de', cleaned.length, 'dígitos, agregando 57');
+      return '57' + cleaned;
+    }
+    
+    console.log('Número no válido');
+    return null;
   };
 
   // Función para generar nombre del archivo PDF
@@ -532,13 +557,17 @@ Gracias por confiar en nosotros.
   // Modal WhatsApp event listeners
   document.getElementById('confirmWhatsApp').addEventListener('click', () => {
     const telefono = document.getElementById('Telcliente').textContent.trim();
+    console.log('Teléfono desde el campo:', telefono);
+    
     const cleanedPhone = cleanPhoneNumber(telefono);
+    console.log('Teléfono procesado:', cleanedPhone);
     
     if (cleanedPhone) {
       const whatsappUrl = generateWhatsAppLink(cleanedPhone);
+      console.log('URL de WhatsApp:', whatsappUrl);
       window.open(whatsappUrl, '_blank');
     } else {
-      alert('Número de teléfono no válido. Por favor, verifica el número del cliente.');
+      alert(`Número de teléfono no válido: "${telefono}"\nPor favor, verifica que el número tenga al menos 7 dígitos.`);
     }
     
     document.getElementById('whatsappModal').style.display = 'none';
