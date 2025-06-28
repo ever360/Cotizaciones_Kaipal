@@ -96,7 +96,7 @@
 
   <!-- Contenido similar al anterior -->
   <div class="ticket-header">
-    <h2>Cotización 1.2</h2>
+    <h2>Cotización 1</h2>
     <div class="svg-logo">
       <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
         <polygon points="60,140 60,30 90,30 90,150" fill="blue"/>
@@ -188,8 +188,8 @@
     return `cotizacion_${clienteLimpio}_PVC_${sucursalLimpia}.pdf`;
   };
 
-  // Función para generar PDF
-  const generatePDF = () => {
+  // Función para generar PDF y compartir
+  const generateAndSharePDF = () => {
     return new Promise((resolve, reject) => {
       try {
         const ticket = document.getElementById('ticket');
@@ -216,39 +216,114 @@
           const imgHeight = imgProps.height * ratio;
 
           pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+          
+          // Obtener el PDF como blob
+          const pdfBlob = pdf.output('blob');
           const fileName = generatePDFName();
-          pdf.save(fileName);
-          resolve();
+          
+          // Verificar si el navegador soporta Web Share API
+          if (navigator.share && navigator.canShare) {
+            const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+            
+            if (navigator.canShare({ files: [file] })) {
+              navigator.share({
+                title: 'Cotización PVC',
+                text: 'Cotización de materiales PVC',
+                files: [file]
+              }).then(() => {
+                console.log('PDF compartido exitosamente');
+                resolve();
+              }).catch(error => {
+                console.log('Compartir cancelado o error:', error);
+                // Fallback: descargar el archivo
+                downloadPDFBlob(pdfBlob, fileName);
+                resolve();
+              });
+            } else {
+              // Fallback: crear enlace de descarga
+              downloadPDFBlob(pdfBlob, fileName);
+              resolve();
+            }
+          } else {
+            // Fallback: crear enlace de descarga
+            downloadPDFBlob(pdfBlob, fileName);
+            resolve();
+          }
         }).catch(error => {
           console.error('Error con html2canvas:', error);
           reject(error);
         });
       } catch (error) {
-        console.error('Error en generatePDF:', error);
+        console.error('Error en generateAndSharePDF:', error);
         reject(error);
       }
     });
   };
 
-  // Botón compartir: genera PDF y también abre impresión
+  // Función auxiliar para descargar PDF como fallback
+  const downloadPDFBlob = (blob, fileName) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Función para generar PDF (solo descarga)
+  const generatePDF = () => {
+    return new Promise((resolve, reject) => {
+      try {
+        const ticket = document.getElementById('ticket');
+        
+        html2canvas(ticket, { 
+          scale: 2,
+          useCORS: true,
+          allowTaint: true
+        }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = pdf.internal.pageSize.getHeight();
+
+          const imgProps = {
+            width: canvas.width,
+            height: canvas.height
+          };
+
+          const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
+          const imgWidth = imgProps.width * ratio;
+          const imgHeight = imgProps.height * ratio;
+
+          pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+          const fileName = generatePDFName();
+          pdf.save(fileName);
+          resolve();
+        }).catch(error => {
+          reject(error);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+
+  // Botón compartir: genera PDF y abre diálogo de compartir
   document.getElementById('btnCompartir').addEventListener('click', () => {
     try {
-      // Generar y descargar PDF
-      generatePDF().then(() => {
-        console.log('PDF generado exitosamente');
-        // También abrir ventana de impresión (opcional)
-        setTimeout(() => {
-          window.print();
-        }, 1000);
+      generateAndSharePDF().then(() => {
+        console.log('Proceso de compartir completado');
       }).catch(error => {
-        console.error('Error generando PDF:', error);
-        // Si falla el PDF, al menos mostrar la impresión
-        window.print();
+        console.error('Error compartiendo PDF:', error);
+        alert('Error al generar o compartir el PDF. Tu navegador puede no soportar esta función.');
       });
     } catch (error) {
       console.error('Error en botón compartir:', error);
-      // Fallback a solo impresión si hay error
-      window.print();
+      alert('Error al compartir. Por favor, intenta con el botón de descarga.');
     }
   });
 
