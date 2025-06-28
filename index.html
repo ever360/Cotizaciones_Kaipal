@@ -90,7 +90,7 @@
 
 <div class="ticket" id="ticket">
   <!-- Botón compartir -->
-  <div class="btn-compartir no-print" id="btnCompartir" title="Imprimir">
+  <div class="btn-compartir no-print" id="btnCompartir" title="Compartir PDF">
     <img src="https://raw.githubusercontent.com/ever360/FacAlquiler1/main/share-button-.png" alt="Compartir">
   </div>
 
@@ -176,13 +176,20 @@
     });
   };
 
-  // Botón compartir: solo abre impresión
-  document.getElementById('btnCompartir').addEventListener('click', () => {
-    window.print();
-  });
+  // Función para generar nombre del archivo PDF
+  const generatePDFName = () => {
+    const cliente = document.getElementById('cliente').textContent.trim() || 'cliente';
+    const sucursal = document.getElementById('sucursal').textContent.trim() || 'ciudad';
+    
+    // Limpiar caracteres especiales para el nombre del archivo
+    const clienteLimpio = cliente.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
+    const sucursalLimpia = sucursal.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
+    
+    return `cotizacion_${clienteLimpio}_PVC_${sucursalLimpia}.pdf`;
+  };
 
-  // Botón descargar PDF
-  document.getElementById('downloadPDF').addEventListener('click', async () => {
+  // Función para generar PDF
+  const generatePDF = async () => {
     const ticket = document.getElementById('ticket');
     const canvas = await html2canvas(ticket, { scale: 2 }); // Mejor resolución
 
@@ -204,10 +211,29 @@
     const position = 0;
 
     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    const cliente = document.getElementById('cliente').textContent.trim() || 'cotizacion';
-    pdf.save(`cotizacion_${cliente}.pdf`);
+    const fileName = generatePDFName();
+    pdf.save(fileName);
+  };
+
+  // Botón compartir: genera PDF y también abre impresión
+  document.getElementById('btnCompartir').addEventListener('click', async () => {
+    // Generar y descargar PDF
+    await generatePDF();
+    
+    // También abrir ventana de impresión (opcional)
+    setTimeout(() => {
+      window.print();
+    }, 500); // Pequeño delay para que termine la descarga del PDF
   });
 
+  // Botón descargar PDF (mantiene la funcionalidad original)
+  document.getElementById('downloadPDF').addEventListener('click', generatePDF);
+
+  window.onload = fillData;
+</script>
+
+</body>
+</html>
   window.onload = fillData;
 </script>
 
